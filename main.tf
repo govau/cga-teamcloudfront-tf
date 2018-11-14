@@ -37,6 +37,8 @@ resource "aws_cloudfront_distribution" "distribution" {
   enabled         = true
   is_ipv6_enabled = true
 
+  web_acl_id = "${var.web_acl_id}"
+
   logging_config {
     include_cookies = false
 
@@ -44,12 +46,12 @@ resource "aws_cloudfront_distribution" "distribution" {
   }
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
+    allowed_methods  = "${var.cache_allowed_methods}"
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "${var.domain}"
 
     forwarded_values {
-      query_string = false
+      query_string = "${var.forward_query_string}"
 
       cookies {
         forward = "none"
