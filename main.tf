@@ -52,9 +52,11 @@ resource "aws_cloudfront_distribution" "distribution" {
 
     forwarded_values {
       query_string = "${var.forward_query_string}"
+      headers      = "${var.forward_headers}"
 
       cookies {
-        forward = "none"
+        forward           = "${var.forward_cookies}"
+        whitelisted_names = "${var.forward_cookies_whitelist}"
       }
     }
 
