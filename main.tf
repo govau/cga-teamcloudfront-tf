@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "logs" {
-  bucket_prefix = "cdnlogs-${substr(var.domain, 0, min(28, length(var.domain)))}-"
+  bucket_prefix = "cdnlogs-${substr(replace(var.domain,".","-"), 0, min(28, length(var.domain)))}-"
   acl           = "private"
 
   server_side_encryption_configuration {
