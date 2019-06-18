@@ -1,6 +1,10 @@
 resource "aws_s3_bucket" "logs" {
-  bucket_prefix = "cdnlogs-${substr(replace(var.domain,".","-"), 0, min(28, length(var.domain)))}-"
-  acl           = "private"
+  bucket_prefix = "cdnlogs-${substr(
+    replace(var.domain, ".", "-"),
+    0,
+    min(28, length(var.domain)),
+  )}-"
+  acl = "private"
 
   server_side_encryption_configuration {
     rule {
@@ -13,17 +17,17 @@ resource "aws_s3_bucket" "logs" {
 
 # We expect the certificate for this domain to already be in ACM
 data "aws_acm_certificate" "domain" {
-  provider = "aws.us_east_aws"
-  domain   = "${var.domain}"
+  provider = aws.us_east_aws
+  domain   = var.domain
   statuses = ["ISSUED"]
 }
 
 resource "aws_cloudfront_distribution" "distribution" {
-  aliases = ["${var.domain}"]
+  aliases = [var.domain]
 
   origin {
-    domain_name = "${var.origin}"
-    origin_id   = "${var.domain}"
+    domain_name = var.origin
+    origin_id   = var.domain
 
     custom_origin_config {
       http_port  = 80
@@ -37,33 +41,33 @@ resource "aws_cloudfront_distribution" "distribution" {
   enabled         = true
   is_ipv6_enabled = true
 
-  web_acl_id = "${var.web_acl_id}"
+  web_acl_id = var.web_acl_id
 
   logging_config {
     include_cookies = false
 
-    bucket = "${aws_s3_bucket.logs.bucket_domain_name}"
+    bucket = aws_s3_bucket.logs.bucket_domain_name
   }
 
   default_cache_behavior {
-    allowed_methods  = "${var.cache_allowed_methods}"
+    allowed_methods  = var.cache_allowed_methods
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "${var.domain}"
+    target_origin_id = var.domain
 
     forwarded_values {
-      query_string = "${var.forward_query_string}"
-      headers      = "${var.forward_headers}"
+      query_string = var.forward_query_string
+      headers      = var.forward_headers
 
       cookies {
-        forward           = "${var.forward_cookies}"
-        whitelisted_names = "${var.forward_cookies_whitelist}"
+        forward           = var.forward_cookies
+        whitelisted_names = var.forward_cookies_whitelist
       }
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = "${var.min_ttl}"
-    default_ttl            = "${var.default_ttl}"
-    max_ttl                = "${var.max_ttl}"
+    min_ttl                = var.min_ttl
+    default_ttl            = var.default_ttl
+    max_ttl                = var.max_ttl
   }
 
   price_class = "PriceClass_All"
@@ -75,8 +79,9 @@ resource "aws_cloudfront_distribution" "distribution" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = "${data.aws_acm_certificate.domain.arn}"
+    acm_certificate_arn      = data.aws_acm_certificate.domain.arn
     minimum_protocol_version = "TLSv1.1_2016"
     ssl_support_method       = "sni-only"
   }
 }
+

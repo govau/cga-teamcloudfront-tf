@@ -1,9 +1,11 @@
-variable "domain" {}
+variable "domain" {
+}
 
-variable "origin" {}
+variable "origin" {
+}
 
 variable "cache_allowed_methods" {
-  type        = "list"
+  type        = list(string)
   default     = ["HEAD", "GET"]
   description = "Cache allowed methods - allowed values are [HEAD, GET] or [HEAD, GET, OPTIONS] or [HEAD, DELETE, POST, GET, OPTIONS, PUT, PATCH]"
 }
@@ -19,7 +21,7 @@ variable "web_acl_id" {
 }
 
 variable "forward_headers" {
-  type    = "list"
+  type    = list(string)
   default = []
 }
 
@@ -47,3 +49,4 @@ variable "min_ttl" {
   description = "(Optional) - The minimum amount of time that you want objects to stay in CloudFront caches before CloudFront queries your origin to see whether the object has been updated. Defaults to 0 seconds."
   default     = "0"
 }
+
