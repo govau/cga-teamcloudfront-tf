@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "logs" {
     0,
     min(28, length(var.domain)),
   )}-"
-  acl = "private"
+  acl = "log-delivery-write"
 
   server_side_encryption_configuration {
     rule {
